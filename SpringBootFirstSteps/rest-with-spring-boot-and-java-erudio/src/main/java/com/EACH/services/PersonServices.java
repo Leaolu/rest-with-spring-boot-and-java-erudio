@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.EACH.Mapper.DozerMapper;
+import com.EACH.Mapper.custom.PersonMapper;
 import com.EACH.data.vo.v1.PersonVO;
+import com.EACH.data.vo.v2.PersonVOV2;
 import com.EACH.exceptions.ResourceNotFoundException;
 import com.EACH.model.Person;
 import com.EACH.repositories.PersonRepository;
@@ -19,6 +21,9 @@ public class PersonServices {
 	
 	@Autowired
 	PersonRepository personRepository;
+	
+	@Autowired
+	PersonMapper mapper;
 	
 	public PersonVO findById(Long id) {
 		logger.info("Finding a person");
@@ -36,6 +41,12 @@ public class PersonServices {
 		var person = DozerMapper.parseObject(personVO, Person.class);
 		return DozerMapper.parseObject(personRepository.save(person), PersonVO.class);
 	}
+	
+	public PersonVOV2 createV2(PersonVOV2 personVO) {
+		logger.info("Creating a person");
+		var person = mapper.convertVOtoEntity(personVO);
+		return mapper.convertEntityToVO(person);	
+		}
 	
 	public PersonVO Update(PersonVO person, Long id) {
 		PersonVO entity = DozerMapper.parseObject(personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Id not found!")), PersonVO.class);
