@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.EACH.Mapper.DozerMapper;
+import com.EACH.data.vo.v1.PersonVO;
 import com.EACH.exceptions.ResourceNotFoundException;
 import com.EACH.model.Person;
 import com.EACH.repositories.PersonRepository;
@@ -18,28 +20,31 @@ public class PersonServices {
 	@Autowired
 	PersonRepository personRepository;
 	
-	public Person findById(Long id) {
+	public PersonVO findById(Long id) {
 		logger.info("Finding a person");
-		return personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Id not found!"));
+		var entity = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Id not found!"));
+		return DozerMapper.parseObject(entity, PersonVO.class);
 	}
 	
-	public List<Person> findAll(){
+	public List<PersonVO> findAll(){
 		logger.info("Finding all people");
-		return personRepository.findAll();
+		return DozerMapper.parseListObjects(personRepository.findAll(), PersonVO.class);
 	}
 	
-	public Person create(Person person) {
+	public PersonVO create(PersonVO personVO) {
 		logger.info("Creating a person");
-		return personRepository.save(person);
+		var person = DozerMapper.parseObject(personVO, Person.class);
+		return DozerMapper.parseObject(personRepository.save(person), PersonVO.class);
 	}
 	
-	public Person Update(Person person, Long id) {
-		Person entity = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Id not found!"));
+	public PersonVO Update(PersonVO person, Long id) {
+		PersonVO entity = DozerMapper.parseObject(personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Id not found!")), PersonVO.class);
 		updatePerson(person, entity);
-		return personRepository.save(entity);
+		personRepository.save(DozerMapper.parseObject(entity, Person.class));
+		return entity;
 	}
 	
-	private void updatePerson(Person person, Person entity) {
+	private void updatePerson(PersonVO person, PersonVO entity) {
 		entity.setFirstName(person.getFirstName());
 		entity.setLastName(person.getLastName());
 		entity.setAddress(person.getAddress());
