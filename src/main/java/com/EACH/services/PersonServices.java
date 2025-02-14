@@ -4,14 +4,15 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.EACH.PersonController;
 import com.EACH.Mapper.DozerMapper;
 import com.EACH.Mapper.custom.PersonMapper;
+import com.EACH.controllers.PersonController;
 import com.EACH.data.vo.v1.PersonVO;
 import com.EACH.data.vo.v2.PersonVOV2;
 import com.EACH.exceptions.RequiredObjectIsNull;
@@ -22,7 +23,7 @@ import com.EACH.repositories.PersonRepository;
 @Service
 public class PersonServices {
 	
-	private Logger logger = Logger.getLogger(PersonServices.class.getName());
+	private Logger logger = LoggerFactory.getLogger(PersonServices.class.getName());	
 	
 	@Autowired
 	PersonRepository personRepository;

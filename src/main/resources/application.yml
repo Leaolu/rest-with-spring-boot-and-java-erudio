@@ -14,7 +14,14 @@ spring:
         #dialect: org.hibernate.dialect.MySQL8Dialect
     show-sql: false
     open-in-view: true
+logging:
+  level:
+    root: WARN
+    com.EACH: DEBUG
+    
 springdoc:
   pathsToMatch: /api/**/v1/**
   swagger-ui:
    use-root-path: true
+
+    

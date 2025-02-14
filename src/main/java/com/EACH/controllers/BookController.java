@@ -1,4 +1,4 @@
-package com.EACH;
+package com.EACH.controllers;
 
 import java.util.List;
 

@@ -4,13 +4,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.EACH.BookController;
 import com.EACH.Mapper.DozerMapper;
+import com.EACH.controllers.BookController;
 import com.EACH.data.vo.v1.BookDTO;
 import com.EACH.exceptions.RequiredObjectIsNull;
 import com.EACH.exceptions.ResourceNotFoundException;
@@ -20,7 +21,7 @@ import com.EACH.repositories.BookRepository;
 @Service
 public class BookServices {
 	
-	private Logger logger = Logger.getLogger(BookServices.class.getName());
+	private Logger logger = LoggerFactory.getLogger(BookServices.class.getName());
 	
 	@Autowired
 	BookRepository Repository;
