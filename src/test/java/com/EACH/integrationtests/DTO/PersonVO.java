@@ -19,6 +19,7 @@ public class PersonVO implements Serializable {
 	private String lastName;
 	private String address;
 	private String gender;
+	private Boolean enabled;
 
 	public PersonVO() {
 	}
@@ -29,6 +30,7 @@ public class PersonVO implements Serializable {
 		this.lastName = lastName;
 		this.address = address;
 		this.gender = gender;
+		this.enabled = true;
 	}
 
 	public Long getKey() {
@@ -71,26 +73,32 @@ public class PersonVO implements Serializable {
 		this.gender = gender;
 	}
 
+	public Boolean getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
+
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + Objects.hash(address, firstName, gender, key, lastName);
-		return result;
+		return Objects.hash(address, enabled, firstName, gender, key, lastName);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		PersonVO other = (PersonVO) obj;
-		return Objects.equals(address, other.address) && Objects.equals(firstName, other.firstName)
-				&& Objects.equals(gender, other.gender) && Objects.equals(key, other.key)
-				&& Objects.equals(lastName, other.lastName);
+		return Objects.equals(address, other.address) && Objects.equals(enabled, other.enabled)
+				&& Objects.equals(firstName, other.firstName) && Objects.equals(gender, other.gender)
+				&& Objects.equals(key, other.key) && Objects.equals(lastName, other.lastName);
 	}
+	
 
 }

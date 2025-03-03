@@ -8,6 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.EACH.Mapper.DozerMapper;
@@ -30,14 +31,14 @@ public class BookServices {
 		logger.info("Finding Book!");
 		var entity = Repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book couldn't be found, please insert a valid ID."));
 		BookDTO DTO = DozerMapper.parseObject(entity, BookDTO.class);
-		DTO.add(linkTo(methodOn(BookController.class).findById(id)).withSelfRel());
+		addHateoasLinks(DTO);
 		return DTO;
 	}
 	
 	public List<BookDTO> findAll(){
 		logger.info("Finding all Books");
 		List<BookDTO> books = DozerMapper.parseListObjects(Repository.findAll(), BookDTO.class);
-		books.stream().forEach(x -> x.add(linkTo(methodOn(BookController.class).findById(x.getKey())).withSelfRel()));
+		books.stream().forEach(x ->addHateoasLinks(x));
 		return books;
 	}
 	
@@ -46,7 +47,7 @@ public class BookServices {
 		logger.info("Creating a Book");
 		var book = DozerMapper.parseObject(DTO, Book.class);
 		BookDTO bookDTO = DozerMapper.parseObject(Repository.save(book), BookDTO.class);
-		bookDTO.add(linkTo(methodOn(BookController.class).findById(bookDTO.getKey())).withSelfRel());
+		addHateoasLinks(bookDTO);
 		return bookDTO;
 	}
 	
@@ -56,7 +57,7 @@ public class BookServices {
 		BookDTO book = findById(id);
 		updateBook(bookDTO, book);
 		Repository.save(DozerMapper.parseObject(book, Book.class));
-		book.add(linkTo(methodOn(BookController.class).findById(id)).withSelfRel());
+		addHateoasLinks(book);
 		return book;
 		
 	}
@@ -68,9 +69,19 @@ public class BookServices {
 		original.setTitle(updated.getTitle());
 	}
 	
-	public void delete(Long id) {
+	public ResponseEntity<?> delete(Long id) {
 		logger.info("Deleting a Book");
 		Book book = Repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Id not Found!"));
 		Repository.delete(book);
+		return ResponseEntity.noContent().build();
+	}
+	
+	private void addHateoasLinks(BookDTO DTO) {
+		DTO.add(linkTo(methodOn(BookController.class).findById(DTO.getKey())).withSelfRel().withType("GET"));
+		DTO.add(linkTo(methodOn(BookController.class).findAll()).withRel("findAll").withType("GET"));
+		DTO.add(linkTo(methodOn(BookController.class).create(DTO)).withRel("create").withType("POST"));
+		DTO.add(linkTo(methodOn(BookController.class).update(DTO, DTO.getKey())).withRel("update").withType("PUT"));
+		DTO.add(linkTo(methodOn(BookController.class).delete(DTO.getKey())).withRel("delete").withType("DELETE"));
+		
 	}
 }

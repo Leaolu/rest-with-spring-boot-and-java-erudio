@@ -8,6 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.EACH.Mapper.DozerMapper;
@@ -19,6 +20,8 @@ import com.EACH.exceptions.RequiredObjectIsNull;
 import com.EACH.exceptions.ResourceNotFoundException;
 import com.EACH.model.Person;
 import com.EACH.repositories.PersonRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class PersonServices {
@@ -35,7 +38,7 @@ public class PersonServices {
 		logger.info("Finding a person");
 		var entity = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Id not found!"));
 		PersonVO vo = DozerMapper.parseObject(entity, PersonVO.class);
-		vo.add(linkTo(methodOn(PersonController.class).findById(id)).withSelfRel());
+		addHateoasLinks(vo);
 		return vo;
 	}
 	
@@ -45,7 +48,7 @@ public class PersonServices {
 		people
 		.stream()
 		.forEach
-		(x -> x.add(linkTo(methodOn(PersonController.class).findById(x.getKey())).withSelfRel()));
+		(x -> addHateoasLinks(x));
 		return people;
 	}
 	
@@ -54,7 +57,7 @@ public class PersonServices {
 		logger.info("Creating a person");
 		var person = DozerMapper.parseObject(personVO, Person.class);
 		PersonVO vo = DozerMapper.parseObject(personRepository.save(person), PersonVO.class);
-		vo.add(linkTo(methodOn(PersonController.class).findById(vo.getKey())).withSelfRel());
+		addHateoasLinks(vo);
 		return vo;
 	}
 	
@@ -71,7 +74,7 @@ public class PersonServices {
 				.orElseThrow(() -> new ResourceNotFoundException("Id not found!")), PersonVO.class);
 		updatePerson(person, vo);
 		personRepository.save(DozerMapper.parseObject(vo, Person.class));
-		vo.add(linkTo(methodOn(PersonController.class).findById(vo.getKey())).withSelfRel());
+		addHateoasLinks(vo);
 		return vo;
 	}
 	
@@ -81,10 +84,30 @@ public class PersonServices {
 		entity.setAddress(person.getAddress());
 		entity.setGender(person.getGender());
 	}
-
-	public void delete(Long id) {
+	
+	@Transactional
+	public PersonVO disablePerson(Long id) {
+		logger.info("Desabling a person");
+		personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Id not found!"));
+		personRepository.disablePerson(id);
+		var DTO = DozerMapper.parseObject(personRepository.findById(id).get(), PersonVO.class);
+		addHateoasLinks(DTO);
+		return DTO;
+	}
+	public ResponseEntity<?> delete(Long id) {
 		logger.info("Deleting a person");
 		Person entity = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Id not found!"));
 		personRepository.delete(entity);
+		return ResponseEntity.noContent().build();
+	}
+	
+	private void addHateoasLinks(PersonVO DTO) {
+		DTO.add(linkTo(methodOn(PersonController.class).findById(DTO.getKey())).withSelfRel().withType("GET"));
+		DTO.add(linkTo(methodOn(PersonController.class).findAll()).withRel("findAll").withType("GET"));
+		DTO.add(linkTo(methodOn(PersonController.class).create(DTO)).withRel("create").withType("POST"));
+		DTO.add(linkTo(methodOn(PersonController.class).disablePerson(DTO.getKey())).withRel("disable").withType("PATCH"));
+		DTO.add(linkTo(methodOn(PersonController.class).update(DTO, DTO.getKey())).withRel("update").withType("PUT"));
+		DTO.add(linkTo(methodOn(PersonController.class).delete(DTO.getKey())).withRel("delete").withType("DELETE"));
+		
 	}
 }

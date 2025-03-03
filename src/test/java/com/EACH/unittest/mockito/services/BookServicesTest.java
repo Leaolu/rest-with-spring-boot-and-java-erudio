@@ -1,6 +1,7 @@
 package com.EACH.unittest.mockito.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -50,15 +51,41 @@ class BookServicesTest {
 
 		when(repository.findById(1L)).thenReturn(Optional.of(book));
 
-		var result = service.findById(1L);
-		Assertions.assertNotNull(result);
-		Assertions.assertNotNull(result.getKey());
-		Assertions.assertNotNull(result.getLinks());
-		assertThat(result.toString().contains("links: [</api/book/v1/1>;rel=\"self\"]")).isTrue();
-		assertThat("Title test1").isEqualTo(result.getTitle());
-		assertThat("Author test1").isEqualTo(result.getAuthor());
-		Assertions.assertNotNull(result.getLaunchDate());
-		assertThat(1D).isEqualTo(result.getPrice());
+		var book1 = service.findById(1L);
+		Assertions.assertNotNull(book1);
+		Assertions.assertNotNull(book1.getKey());
+		Assertions.assertNotNull(book1.getLinks());
+		
+		
+		assertNotNull(book1.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("self")
+						&& link.getHref().endsWith("/api/book/v1/1")
+						&& link.getType().equals("GET")));
+		
+		assertNotNull(book1.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("findAll")
+						&& link.getHref().endsWith("/api/book/v1")
+						&& link.getType().equals("GET")));
+		
+		assertNotNull(book1.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("create")
+						&& link.getHref().endsWith("/api/book/v1")
+						&& link.getType().equals("POST")));
+		
+		assertNotNull(book1.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("update")
+						&& link.getHref().endsWith("/api/book/v1/1")
+						&& link.getType().equals("PUT")));
+		
+		assertNotNull(book1.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("delete")
+						&& link.getHref().endsWith("/api/book/v1/1")
+						&& link.getType().equals("DELETE")));
+		
+		assertThat("Title test1").isEqualTo(book1.getTitle());
+		assertThat("Author test1").isEqualTo(book1.getAuthor());
+		Assertions.assertNotNull(book1.getLaunchDate());
+		assertThat(1D).isEqualTo(book1.getPrice());
 	}
 
 	@Test
@@ -75,7 +102,32 @@ class BookServicesTest {
 		Assertions.assertNotNull(bookOne);
 		Assertions.assertNotNull(bookOne.getKey());
 		Assertions.assertNotNull(bookOne.getLinks());
-		assertThat(bookOne.toString().contains("links: [</api/book/v1/1>;rel=\"self\"]")).isTrue();
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("self")
+						&& link.getHref().endsWith("/api/book/v1/1")
+						&& link.getType().equals("GET")));
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("findAll")
+						&& link.getHref().endsWith("/api/book/v1")
+						&& link.getType().equals("GET")));
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("create")
+						&& link.getHref().endsWith("/api/book/v1")
+						&& link.getType().equals("POST")));
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("update")
+						&& link.getHref().endsWith("/api/book/v1/1")
+						&& link.getType().equals("PUT")));
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("delete")
+						&& link.getHref().endsWith("/api/book/v1/1")
+						&& link.getType().equals("DELETE")));
+		
 		assertThat("Title test1").isEqualTo(bookOne.getTitle());
 		assertThat("Author test1").isEqualTo(bookOne.getAuthor());
 		Assertions.assertNotNull(bookOne.getLaunchDate());
@@ -86,7 +138,31 @@ class BookServicesTest {
 		Assertions.assertNotNull(bookFour.getKey());
 		Assertions.assertNotNull(bookFour.getLinks());
 		
-		assertThat(bookFour.toString().contains("links: [</api/book/v1/4>;rel=\"self\"]")).isTrue();
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("self")
+						&& link.getHref().endsWith("/api/book/v1/4")
+						&& link.getType().equals("GET")));
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("findAll")
+						&& link.getHref().endsWith("/api/book/v1")
+						&& link.getType().equals("GET")));
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("create")
+						&& link.getHref().endsWith("/api/book/v1")
+						&& link.getType().equals("POST")));
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("update")
+						&& link.getHref().endsWith("/api/book/v1/4")
+						&& link.getType().equals("PUT")));
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("delete")
+						&& link.getHref().endsWith("/api/book/v1/4")
+						&& link.getType().equals("DELETE")));
+		
 		assertThat("Title test4").isEqualTo(bookFour.getTitle());
 		assertThat("Author test4").isEqualTo(bookFour.getAuthor());
 		Assertions.assertNotNull(bookFour.getLaunchDate());
@@ -96,7 +172,32 @@ class BookServicesTest {
 		Assertions.assertNotNull(bookSeven);
 		Assertions.assertNotNull(bookSeven.getKey());
 		Assertions.assertNotNull(bookSeven.getLinks());
-		assertThat(bookSeven.toString().contains("links: [</api/book/v1/7>;rel=\"self\"]")).isTrue();
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("self")
+						&& link.getHref().endsWith("/api/book/v1/7")
+						&& link.getType().equals("GET")));
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("findAll")
+						&& link.getHref().endsWith("/api/book/v1")
+						&& link.getType().equals("GET")));
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("create")
+						&& link.getHref().endsWith("/api/book/v1")
+						&& link.getType().equals("POST")));
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("update")
+						&& link.getHref().endsWith("/api/book/v1/7")
+						&& link.getType().equals("PUT")));
+		
+		assertNotNull(bookOne.getLinks().stream()
+				.anyMatch(link -> link.getRel().value().equals("delete")
+						&& link.getHref().endsWith("/api/book/v1/7")
+						&& link.getType().equals("DELETE")));
+		
 		assertThat("Title test7").isEqualTo(bookSeven.getTitle());
 		assertThat("Author test7").isEqualTo(bookSeven.getAuthor());
 		Assertions.assertNotNull(bookSeven.getLaunchDate());
@@ -118,15 +219,15 @@ class BookServicesTest {
 
 		when(repository.save(book)).thenReturn(persisted);
 
-		var result = service.Update(DTO, 1L);
-		Assertions.assertNotNull(result);
-		Assertions.assertNotNull(result.getKey());
-		Assertions.assertNotNull(result.getLinks());
-		assertThat("Title test1").isEqualTo(result.getTitle());
-		assertThat("Author test1").isEqualTo(result.getAuthor());
-		Assertions.assertNotNull(result.getLaunchDate());
-		assertThat(1D).isEqualTo(result.getPrice());
-		assertThat(result.toString().contains("links: [</api/book/v1/1>;rel=\"self\"]"));
+		var book1 = service.Update(DTO, 1L);
+		Assertions.assertNotNull(book1);
+		Assertions.assertNotNull(book1.getKey());
+		Assertions.assertNotNull(book1.getLinks());
+		assertThat("Title test1").isEqualTo(book1.getTitle());
+		assertThat("Author test1").isEqualTo(book1.getAuthor());
+		Assertions.assertNotNull(book1.getLaunchDate());
+		assertThat(1D).isEqualTo(book1.getPrice());
+		assertThat(book1.toString().contains("links: [</api/book/v1/1>;rel=\"self\"]"));
 	}
 
 	@Test
@@ -142,14 +243,14 @@ class BookServicesTest {
 
 		when(repository.save(book)).thenReturn(persisted);
 
-		var result = service.create(DTO);
-		Assertions.assertNotNull(result);
-		Assertions.assertNotNull(result.getKey());
-		Assertions.assertNotNull(result.getLinks());
-		assertThat("Title test1").isEqualTo(result.getTitle());
-		assertThat("Author test1").isEqualTo(result.getAuthor());
-		Assertions.assertNotNull(result.getLaunchDate());
-		assertThat(1D).isEqualTo(result.getPrice());
+		var book1 = service.create(DTO);
+		Assertions.assertNotNull(book1);
+		Assertions.assertNotNull(book1.getKey());
+		Assertions.assertNotNull(book1.getLinks());
+		assertThat("Title test1").isEqualTo(book1.getTitle());
+		assertThat("Author test1").isEqualTo(book1.getAuthor());
+		Assertions.assertNotNull(book1.getLaunchDate());
+		assertThat(1D).isEqualTo(book1.getPrice());
 	}
 
 	@Test
