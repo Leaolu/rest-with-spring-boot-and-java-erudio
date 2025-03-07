@@ -1,8 +1,12 @@
 package com.EACH.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,9 +46,16 @@ public class PersonController implements PersonControllerDocs{
 		return personService.findById(id);
 	}
 
+	
 	@GetMapping(produces = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML })
-	public List<PersonVO> findAll() {
-		return personService.findAll();
+	public ResponseEntity<PagedModel<EntityModel<PersonVO>>> findAll(
+			@RequestParam(defaultValue = "0")Integer page,
+			@RequestParam(defaultValue = "12")Integer size,
+			@RequestParam(defaultValue = "asc")String direction
+			){
+		var sortDirection = "desc".equalsIgnoreCase(direction) ? Direction.DESC : Direction.ASC;
+		Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "firstName"));
+		return ResponseEntity.ok(personService.findAll(pageable));
 	}
 
 	// @CrossOrigin(origins = {"http://localhost:8080",
