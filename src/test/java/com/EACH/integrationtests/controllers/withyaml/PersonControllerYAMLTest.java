@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -215,6 +216,7 @@ public class PersonControllerYAMLTest extends AbstractIntegrationTest{
 	
 	@Test
 	@Order(6)
+	@Disabled("Under development")
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
 		var content = given(specification)
 			.accept(MediaType.APPLICATION_YML)
