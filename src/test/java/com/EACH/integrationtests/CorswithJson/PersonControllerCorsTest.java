@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.EACH.configs.TestConfigs;
-import com.EACH.integrationtests.DTO.PersonVO;
+import com.EACH.data.vo.v1.PersonDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -35,14 +35,14 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest{
 	private static RequestSpecification specification;
 	private static ObjectMapper objectMapper;
 	
-	private static PersonVO person;
+	private static PersonDTO person;
 	
 	@BeforeAll
 	static void setUp() {
 		objectMapper = new ObjectMapper();
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		
-		person = new PersonVO();
+		person = new PersonDTO();
 	}
 	
 
@@ -69,7 +69,7 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest{
 				.extract()
 					.body()
 						.asString();
-		PersonVO createdPerson = objectMapper.readValue(content, PersonVO.class);
+		PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
 		
 		person = createdPerson;
 		
@@ -134,7 +134,7 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest{
 				.extract()
 					.body()
 						.asString();
-		PersonVO createdPerson = objectMapper.readValue(content, PersonVO.class);
+		PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
 		
 		person = createdPerson;
 		

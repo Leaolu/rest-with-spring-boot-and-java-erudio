@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS `books`;
+
 CREATE TABLE `books` (
   `id` INT(10) AUTO_INCREMENT PRIMARY KEY,
   `author` longtext,

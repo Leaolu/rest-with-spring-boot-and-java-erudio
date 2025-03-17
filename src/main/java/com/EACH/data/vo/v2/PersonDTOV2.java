@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.Objects;
 
 
-public class PersonVOV2 implements Serializable{
+public class PersonDTOV2 implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	
@@ -16,9 +16,9 @@ public class PersonVOV2 implements Serializable{
 	private String gender;
 	private Date birthday;
 	
-	public PersonVOV2() {}
+	public PersonDTOV2() {}
 
-	public PersonVOV2(Long id, String firstName, String lastName, String address, String gender, Date birthday) {
+	public PersonDTOV2(Long id, String firstName, String lastName, String address, String gender, Date birthday) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -89,7 +89,7 @@ public class PersonVOV2 implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PersonVOV2 other = (PersonVOV2) obj;
+		PersonDTOV2 other = (PersonDTOV2) obj;
 		return Objects.equals(id, other.id);
 	}
 	

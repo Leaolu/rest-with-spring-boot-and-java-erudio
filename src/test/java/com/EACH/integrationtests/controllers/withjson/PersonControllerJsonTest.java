@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -18,9 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.EACH.configs.TestConfigs;
-import com.EACH.integrationtests.DTO.PersonVO;
+import com.EACH.data.vo.v1.PersonDTO;
+import com.EACH.integrationtests.DTO.wrapper.json.WrapperPersonDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,14 +39,14 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 	private static RequestSpecification specification;
 	private static ObjectMapper objectMapper;
 	
-	private static PersonVO person;
+	private static PersonDTO person;
 	
 	@BeforeAll
 	static void setUp() {
 		objectMapper = new ObjectMapper();
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		
-		person = new PersonVO();
+		person = new PersonDTO();
 	}
 	
 
@@ -75,7 +74,7 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 				.extract()
 					.body()
 						.asString();
-		PersonVO createdPerson = objectMapper.readValue(content, PersonVO.class);
+		PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
 		
 		person = createdPerson;
 		
@@ -106,7 +105,7 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 				.extract()
 				.body()
 				.asString();
-		PersonVO createdPerson = objectMapper.readValue(content, PersonVO.class);
+		PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
 		
 		person = createdPerson;
 		
@@ -135,7 +134,7 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 				.extract()
 					.body()
 						.asString();
-		PersonVO createdPerson = objectMapper.readValue(content, PersonVO.class);
+		PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
 		
 		person = createdPerson;
 		
@@ -162,7 +161,7 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 				.extract()
 				.body()
 				.asString();
-		PersonVO createdPerson = objectMapper.readValue(content, PersonVO.class);
+		PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
 		
 		person = createdPerson;
 		
@@ -188,10 +187,10 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 	
 	@Test
 	@Order(6)
-	@Disabled("Under development")
 	void findByAllTest() throws JsonMappingException, JsonProcessingException {
 		var content = given(specification)
 			.accept(MediaType.APPLICATION_JSON_VALUE)
+			.queryParam("page", 3, "size", 12, "direction", "asc")
 			.when()
 				.get()
 			.then()
@@ -201,26 +200,71 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 					.body()
 						.asString();
 		
-		List<PersonVO> people = objectMapper.readValue(content, new TypeReference<List<PersonVO>>() {});
-		PersonVO firstPerson = people.get(0);
+		WrapperPersonDTO wrapper = objectMapper.readValue(content, WrapperPersonDTO.class);
+		List<PersonDTO> people = wrapper.getEmbedded().getPeople();
+		//List<PersonDTO> people = objectMapper.readValue(content, new TypeReference<List<PersonDTO>>() {});
+		PersonDTO firstPerson = people.get(0);
 		
 		assertNotNull(firstPerson.getKey());
 		assertTrue(firstPerson.getKey()>0);
 		
-		assertEquals("Nancy", firstPerson.getFirstName());
-		assertEquals("Leao", firstPerson.getLastName());
-		assertEquals("SP", firstPerson.getAddress());
+		assertEquals("Albertine", firstPerson.getFirstName());
+		assertEquals("Gartell", firstPerson.getLastName());
+		assertEquals("PO Box 51718", firstPerson.getAddress());
 		assertEquals("Female", firstPerson.getGender());
-		assertTrue(firstPerson.getEnabled());
+		assertEquals(false, firstPerson.getEnabled());
 		
-		PersonVO sixthPerson = people.get(6);
+		PersonDTO sixthPerson = people.get(6);
 			
 		assertNotNull(sixthPerson.getKey());
 		assertTrue(sixthPerson.getKey()>0);
 		
-		assertEquals("Ranny", sixthPerson.getFirstName());
-		assertEquals("Andrade", sixthPerson.getLastName());
-		assertEquals("SP", sixthPerson.getAddress());
+		assertEquals("Alexandr", sixthPerson.getFirstName());
+		assertEquals("Tiltman", sixthPerson.getLastName());
+		assertEquals("13th Floor", sixthPerson.getAddress());
+		assertEquals("Male", sixthPerson.getGender());
+		assertTrue(sixthPerson.getEnabled());
+	}
+	
+	//{{baseUrl}}/api/person/v1/findByName/and?page=0&size=12&direction=asc
+	@Test
+	@Order(7)
+	void findByNameTest() throws JsonMappingException, JsonProcessingException {
+		var content = given(specification)
+				.accept(MediaType.APPLICATION_JSON_VALUE)
+				.pathParam("firstName", "and")
+				.queryParam("page", 0, "size", 12, "direction", "asc")
+				.when()
+				.get("findByName/{firstName}")
+				.then()
+				.statusCode(200)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.extract()
+				.body()
+				.asString();
+		
+		WrapperPersonDTO wrapper = objectMapper.readValue(content, WrapperPersonDTO.class);
+		List<PersonDTO> people = wrapper.getEmbedded().getPeople();
+		//List<PersonDTO> people = objectMapper.readValue(content, new TypeReference<List<PersonDTO>>() {});
+		PersonDTO firstPerson = people.get(0);
+		
+		assertNotNull(firstPerson.getKey());
+		assertTrue(firstPerson.getKey()>0);
+		
+		assertEquals("Aland", firstPerson.getFirstName());
+		assertEquals("Vern", firstPerson.getLastName());
+		assertEquals("Room 194", firstPerson.getAddress());
+		assertEquals("Male", firstPerson.getGender());
+		assertEquals(true, firstPerson.getEnabled());
+		
+		PersonDTO sixthPerson = people.get(6);
+		
+		assertNotNull(sixthPerson.getKey());
+		assertTrue(sixthPerson.getKey()>0);
+		
+		assertEquals("Alexandra", sixthPerson.getFirstName());
+		assertEquals("Arguile", sixthPerson.getLastName());
+		assertEquals("11th Floor", sixthPerson.getAddress());
 		assertEquals("Female", sixthPerson.getGender());
 		assertTrue(sixthPerson.getEnabled());
 	}

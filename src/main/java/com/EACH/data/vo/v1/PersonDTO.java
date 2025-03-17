@@ -10,9 +10,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.dozermapper.core.Mapping;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 @JsonPropertyOrder({ "id", "firstName", "lastName", "address", "gender" })
 @Relation(collectionRelation = "people")
-public class PersonVO extends RepresentationModel<PersonVO> implements Serializable {
+@XmlRootElement
+public class PersonDTO extends RepresentationModel<PersonDTO> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Mapping("id")
@@ -24,10 +27,10 @@ public class PersonVO extends RepresentationModel<PersonVO> implements Serializa
 	private String gender;
 	private Boolean enabled;
 
-	public PersonVO() {
+	public PersonDTO() {
 	}
 
-	public PersonVO(String firstName, String lastName, String address, String gender) {
+	public PersonDTO(String firstName, String lastName, String address, String gender) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -100,7 +103,7 @@ public class PersonVO extends RepresentationModel<PersonVO> implements Serializa
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PersonVO other = (PersonVO) obj;
+		PersonDTO other = (PersonDTO) obj;
 		return Objects.equals(address, other.address) && Objects.equals(enabled, other.enabled)
 				&& Objects.equals(firstName, other.firstName) && Objects.equals(gender, other.gender)
 				&& Objects.equals(key, other.key) && Objects.equals(lastName, other.lastName);

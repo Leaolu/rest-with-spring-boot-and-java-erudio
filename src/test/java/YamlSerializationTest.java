@@ -2,7 +2,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
-import com.EACH.integrationtests.DTO.PersonVO;
+import com.EACH.data.vo.v1.PersonDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
@@ -11,7 +11,7 @@ public class YamlSerializationTest {
     @Test
     public void testYamlSerialization() throws Exception {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        PersonVO person = new PersonVO();
+        PersonDTO person = new PersonDTO();
         person.setFirstName("John");
         person.setLastName("Doe");
         person.setAddress("New York");

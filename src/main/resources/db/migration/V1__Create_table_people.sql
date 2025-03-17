@@ -40,7 +40,11 @@ CREATE TABLE `people` (
 
 LOCK TABLES `people` WRITE;
 /*!40000 ALTER TABLE `people` DISABLE KEYS */;
-INSERT INTO `people` VALUES (1,'Nancy','Leao','SP','Female'),(2,'Lucas','Leao','SP','male'),(3,'Luisa','Leao','RJ','female'),(4,'Cherie','Emerick','CA','female');
+INSERT INTO `people` VALUES 
+(1,'Nancy','Leao','SP','Female'),
+(2,'Lucas','Leao','SP','male'),
+(3,'Luisa','Leao','RJ','female'),
+(4,'Cherie','Emerick','CA','female');
 /*!40000 ALTER TABLE `people` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

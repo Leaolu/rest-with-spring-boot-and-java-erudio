@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 import com.EACH.Mapper.DozerMapper;
 import com.EACH.Mapper.custom.PersonMapper;
 import com.EACH.controllers.PersonController;
-import com.EACH.data.vo.v1.PersonVO;
-import com.EACH.data.vo.v2.PersonVOV2;
+import com.EACH.data.vo.v1.PersonDTO;
+import com.EACH.data.vo.v2.PersonDTOV2;
 import com.EACH.exceptions.RequiredObjectIsNull;
 import com.EACH.exceptions.ResourceNotFoundException;
 import com.EACH.model.Person;
@@ -39,22 +39,22 @@ public class PersonServices {
 	PersonMapper mapper;
 	
 	@Autowired
-	PagedResourcesAssembler<PersonVO> assembler;
+	PagedResourcesAssembler<PersonDTO> assembler;
 	
-	public PersonVO findById(Long id) {
+	public PersonDTO findById(Long id) {
 		logger.info("Finding a person");
 		var entity = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Id not found!"));
-		PersonVO vo = DozerMapper.parseObject(entity, PersonVO.class);
+		PersonDTO vo = DozerMapper.parseObject(entity, PersonDTO.class);
 		addHateoasLinks(vo);
 		return vo;
 	}
 	
-	public PagedModel<EntityModel<PersonVO>> findAll(Pageable pageable){
+	public PagedModel<EntityModel<PersonDTO>> findAll(Pageable pageable){
 		
 		var people = personRepository.findAll(pageable);
 		
 		var peopleWithLinks = people.map(person -> {
-			var DTO = DozerMapper.parseObject(person, PersonVO.class);
+			var DTO = DozerMapper.parseObject(person, PersonDTO.class);
 			addHateoasLinks(DTO);
 			return DTO;
 		});
@@ -68,34 +68,53 @@ public class PersonServices {
 				.withSelfRel();
 		return assembler.toModel(peopleWithLinks, findAllLink);
 	}
+	public PagedModel<EntityModel<PersonDTO>> findByName(String firstName, Pageable pageable){
+		
+		var people = personRepository.findPeopleByName(firstName, pageable);
+		
+		var peopleWithLinks = people.map(person -> {
+			var DTO = DozerMapper.parseObject(person, PersonDTO.class);
+			addHateoasLinks(DTO);
+			return DTO;
+		});
+		logger.info("Finding people by name");
+		
+		Link findAllLink = 
+				WebMvcLinkBuilder.linkTo
+				(WebMvcLinkBuilder.methodOn
+						(PersonController.class)
+						.findAll(pageable.getPageNumber(), pageable.getPageSize(), String.valueOf(pageable.getSort())))
+				.withSelfRel();
+		return assembler.toModel(peopleWithLinks, findAllLink);
+	}
 	
-	public PersonVO create(PersonVO personVO) {
-		if(personVO == null) throw new RequiredObjectIsNull();
+	public PersonDTO create(PersonDTO PersonDTO) {
+		if(PersonDTO == null) throw new RequiredObjectIsNull();
 		logger.info("Creating a person");
-		var person = DozerMapper.parseObject(personVO, Person.class);
-		PersonVO vo = DozerMapper.parseObject(personRepository.save(person), PersonVO.class);
+		var person = DozerMapper.parseObject(PersonDTO, Person.class);
+		PersonDTO vo = DozerMapper.parseObject(personRepository.save(person), PersonDTO.class);
 		addHateoasLinks(vo);
 		return vo;
 	}
 	
-	public PersonVOV2 createV2(PersonVOV2 personVO) {
+	public PersonDTOV2 createV2(PersonDTOV2 PersonDTO) {
 		logger.info("Creating a person");
-		var person = mapper.convertVOtoEntity(personVO);
+		var person = mapper.convertVOtoEntity(PersonDTO);
 		return mapper.convertEntityToVO(person);	
 		}
 	
-	public PersonVO Update(PersonVO person, Long id) {
+	public PersonDTO Update(PersonDTO person, Long id) {
 		if(person == null) throw new RequiredObjectIsNull();
 		logger.info("Updating a person");
-		PersonVO vo = DozerMapper.parseObject(personRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Id not found!")), PersonVO.class);
+		PersonDTO vo = DozerMapper.parseObject(personRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Id not found!")), PersonDTO.class);
 		updatePerson(person, vo);
 		personRepository.save(DozerMapper.parseObject(vo, Person.class));
 		addHateoasLinks(vo);
 		return vo;
 	}
 	
-	private void updatePerson(PersonVO person, PersonVO entity) {
+	private void updatePerson(PersonDTO person, PersonDTO entity) {
 		entity.setFirstName(person.getFirstName());
 		entity.setLastName(person.getLastName());
 		entity.setAddress(person.getAddress());
@@ -103,11 +122,11 @@ public class PersonServices {
 	}
 	
 	@Transactional
-	public PersonVO disablePerson(Long id) {
+	public PersonDTO disablePerson(Long id) {
 		logger.info("Desabling a person");
 		personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Id not found!"));
 		personRepository.disablePerson(id);
-		var DTO = DozerMapper.parseObject(personRepository.findById(id).get(), PersonVO.class);
+		var DTO = DozerMapper.parseObject(personRepository.findById(id).get(), PersonDTO.class);
 		addHateoasLinks(DTO);
 		return DTO;
 	}
@@ -118,7 +137,7 @@ public class PersonServices {
 		return ResponseEntity.noContent().build();
 	}
 	
-	private void addHateoasLinks(PersonVO DTO) {
+	private void addHateoasLinks(PersonDTO DTO) {
 		DTO.add(linkTo(methodOn(PersonController.class).findById(DTO.getKey())).withSelfRel().withType("GET"));
 		DTO.add(linkTo(methodOn(PersonController.class).findAll(1, 12, "asc")).withRel("findAll").withType("GET"));
 		DTO.add(linkTo(methodOn(PersonController.class).create(DTO)).withRel("create").withType("POST"));

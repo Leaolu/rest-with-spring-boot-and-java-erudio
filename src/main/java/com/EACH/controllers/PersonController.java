@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.EACH.controllers.docs.PersonControllerDocs;
-import com.EACH.data.vo.v1.PersonVO;
-import com.EACH.data.vo.v2.PersonVOV2;
+import com.EACH.data.vo.v1.PersonDTO;
+import com.EACH.data.vo.v2.PersonDTOV2;
 import com.EACH.services.PersonServices;
 import com.EACH.util.MediaType;
 
@@ -42,13 +42,13 @@ public class PersonController implements PersonControllerDocs{
 	@CrossOrigin(origins = "http://localhost:8080")
 	@GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
 			MediaType.APPLICATION_YML })
-	public PersonVO findById(@PathVariable Long id) {
+	public PersonDTO findById(@PathVariable Long id) {
 		return personService.findById(id);
 	}
 
 	
 	@GetMapping(produces = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML })
-	public ResponseEntity<PagedModel<EntityModel<PersonVO>>> findAll(
+	public ResponseEntity<PagedModel<EntityModel<PersonDTO>>> findAll(
 			@RequestParam(defaultValue = "0")Integer page,
 			@RequestParam(defaultValue = "12")Integer size,
 			@RequestParam(defaultValue = "asc")String direction
@@ -57,6 +57,18 @@ public class PersonController implements PersonControllerDocs{
 		Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "firstName"));
 		return ResponseEntity.ok(personService.findAll(pageable));
 	}
+	
+	@GetMapping(value = "/findByName/{firstName}", produces = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML })
+	public ResponseEntity<PagedModel<EntityModel<PersonDTO>>> findByName(
+			@PathVariable String firstName,
+			@RequestParam(defaultValue = "0")Integer page,
+			@RequestParam(defaultValue = "12")Integer size,
+			@RequestParam(defaultValue = "asc")String direction
+			) {
+		var sortDirection = "desc".equalsIgnoreCase(direction) ? Direction.DESC : Direction.ASC;
+		Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "firstName"));
+		return ResponseEntity.ok(personService.findByName(firstName ,pageable));
+	}
 
 	// @CrossOrigin(origins = {"http://localhost:8080",
 	// "https://github.com/Leaolu/rest-with-spring-boot-and-java-erudio"})
@@ -64,7 +76,7 @@ public class PersonController implements PersonControllerDocs{
 			MediaType.APPLICATION_YML }, produces = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
 					MediaType.APPLICATION_YML })
 	@ResponseStatus(HttpStatus.CREATED)
-	public PersonVO create(@RequestBody PersonVO person) {
+	public PersonDTO create(@RequestBody PersonDTO person) {
 		return personService.create(person);
 	}
 
@@ -72,21 +84,21 @@ public class PersonController implements PersonControllerDocs{
 			MediaType.APPLICATION_YML }, produces = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
 					MediaType.APPLICATION_YML })
 	@ResponseStatus(HttpStatus.CREATED)
-	public PersonVOV2 createV2(@RequestBody PersonVOV2 person) {
+	public PersonDTOV2 createV2(@RequestBody PersonDTOV2 person) {
 		return personService.createV2(person);
 	}
 
 	@PutMapping(value = "/{id}", consumes = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
 			MediaType.APPLICATION_YML }, produces = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
 					MediaType.APPLICATION_YML })
-	public PersonVO update(@RequestBody PersonVO person, @PathVariable Long id) {
+	public PersonDTO update(@RequestBody PersonDTO person, @PathVariable Long id) {
 		return personService.Update(person, id);
 	}
 	
 	@PatchMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
 			MediaType.APPLICATION_YML })
 	@Override
-	public PersonVO disablePerson(Long id) {
+	public PersonDTO disablePerson(Long id) {
 		return personService.disablePerson(id);
 	}
 	

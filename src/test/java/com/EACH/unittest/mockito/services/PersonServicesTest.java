@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.EACH.data.vo.v1.PersonVO;
+import com.EACH.data.vo.v1.PersonDTO;
 import com.EACH.exceptions.RequiredObjectIsNull;
 import com.EACH.model.Person;
 import com.EACH.repositories.PersonRepository;
@@ -94,7 +94,7 @@ class PersonServicesTest {
 		List<Person> list = input.mockEntityList();
 
 		when(repository.findAll()).thenReturn(list);
-		var people = new ArrayList<PersonVO>();
+		var people = new ArrayList<PersonDTO>();
 
 		Assertions.assertNotNull(people);
 		Assertions.assertEquals(14, people.size());
@@ -211,7 +211,7 @@ class PersonServicesTest {
 		Person persisted = person;
 		persisted.setId(1L);
 
-		PersonVO vo = input.mockVO(1);
+		PersonDTO vo = input.mockVO(1);
 		vo.setKey(1L);
 
 		when(repository.findById(1L)).thenReturn(Optional.of(person));
@@ -261,7 +261,7 @@ class PersonServicesTest {
 		Person persisted = person;
 		persisted.setId(1L);
 
-		PersonVO vo = input.mockVO(1);
+		PersonDTO vo = input.mockVO(1);
 		vo.setKey(1L);
 
 		when(repository.save(person)).thenReturn(persisted);

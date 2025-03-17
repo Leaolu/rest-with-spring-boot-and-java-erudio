@@ -5,12 +5,14 @@ import java.util.Date;
 import java.util.Objects;
 
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.dozermapper.core.Mapping;
 
-@JsonPropertyOrder({"author", "title", "launchDate", "price"})
+@JsonPropertyOrder({"id", "author", "title", "launchDate", "price"})
+@Relation(collectionRelation = "books")
 public class BookDTO extends RepresentationModel<BookDTO> implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
@@ -39,14 +41,12 @@ public class BookDTO extends RepresentationModel<BookDTO> implements Serializabl
 		this.price = price;
 	}
 
-
 	public Long getKey() {
 		return key;
 	}
-
-
-	public void setKey(Long key) {
-		this.key = key;
+ 
+	public void setKey(Long Key) {
+		this.key = Key;
 	}
 
 
@@ -109,6 +109,13 @@ public class BookDTO extends RepresentationModel<BookDTO> implements Serializabl
 			return false;
 		BookDTO other = (BookDTO) obj;
 		return Objects.equals(key, other.key);
+	}
+
+
+	@Override
+	public String toString() {
+		return "BookDTO [id=" + key + ", author=" + author + ", launchDate=" + launchDate + ", title=" + title
+				+ ", price=" + price + "]";
 	}
 	
 	
