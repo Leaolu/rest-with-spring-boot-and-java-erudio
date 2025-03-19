@@ -1,6 +1,8 @@
 server:
   port: 8080
 
+file:
+   uploadDir: /Projects/rest-with-spring-boot-and-java-erudio/File_Codes
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -16,10 +18,15 @@ spring:
         #dialect: org.hibernate.dialect.MySQL8Dialect
     show-sql: false
     open-in-view: true
-logging:
-  level:
-    root: WARN
-    com.EACH: DEBUG
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB #Maximo de upload
+      max-request-size: 215MB #Maximo de download
+level:
+ root: DEBUG
+ com.EACH: WARNING
     
 cors: 
  originPatterns: http://localhost:8080,http://localhost:3000, https://github.com/Leaolu/rest-with-spring-boot-and-java-erudio
