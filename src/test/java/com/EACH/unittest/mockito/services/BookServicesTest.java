@@ -235,16 +235,17 @@ class BookServicesTest {
 
 	@Test
 	void testCreate() {
-		Book book = input.mockEntity(1);
-		book.setId(1L);
+		Book Book = input.mockEntity(1);
+		Book.setId(1L);
 
-		Book persisted = book;
+		Book persisted = Book;
 		persisted.setId(1L);
 
 		BookDTO DTO = input.mockDTO(1);
 		DTO.setKey(1L);
 
-		when(repository.save(book)).thenReturn(persisted);
+		when(repository.save(Book)).thenReturn(persisted);
+
 
 		var book1 = service.create(DTO);
 		Assertions.assertNotNull(book1);

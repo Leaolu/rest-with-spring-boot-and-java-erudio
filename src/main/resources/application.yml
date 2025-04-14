@@ -24,12 +24,11 @@ spring:
       file-size-threshold: 2KB
       max-file-size: 200MB #Maximo de upload
       max-request-size: 215MB #Maximo de download
-level:
- root: DEBUG
- com.EACH: WARNING
-    
+logging:
+  level:
+    root: DEBUG
 cors: 
- originPatterns: http://localhost:8080,http://localhost:3000, https://github.com/Leaolu/rest-with-spring-boot-and-java-erudio
+ originPatterns: http://localhost:8080,http://localhost:3000,https://github.com/Leaolu/rest-with-spring-boot-and-java-erudio
 springdoc:
   pathsToMatch: /api/**/v1/**
   swagger-ui:

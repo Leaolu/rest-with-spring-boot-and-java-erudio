@@ -218,21 +218,21 @@ public class PersonControllerXMLTest extends AbstractIntegrationTest{
 		assertNotNull(firstPerson.getId());
 		assertTrue(firstPerson.getId()>0);
 		
-		assertEquals("Albertine", firstPerson.getFirstName());
-		assertEquals("Gartell", firstPerson.getLastName());
-		assertEquals("PO Box 51718", firstPerson.getAddress());
+		assertEquals("Allsun", firstPerson.getFirstName());
+		assertEquals("Poundford", firstPerson.getLastName());
+		assertEquals("17th Floor", firstPerson.getAddress());
 		assertEquals("Female", firstPerson.getGender());
-		assertEquals(false, firstPerson.getEnabled());
+		assertTrue(firstPerson.getEnabled());
 		
 		PersonDTO sixthPerson = people.get(6);
 			
 		assertNotNull(sixthPerson.getId());
 		assertTrue(sixthPerson.getId()>0);
 		
-		assertEquals("Alexandr", sixthPerson.getFirstName());
-		assertEquals("Tiltman", sixthPerson.getLastName());
-		assertEquals("13th Floor", sixthPerson.getAddress());
-		assertEquals("Male", sixthPerson.getGender());
+		assertEquals("Aloise", sixthPerson.getFirstName());
+		assertEquals("Whitecross", sixthPerson.getLastName());
+		assertEquals("6th Floor", sixthPerson.getAddress());
+		assertEquals("Female", sixthPerson.getGender());
 		assertTrue(sixthPerson.getEnabled());
 	}
 	@Test
@@ -265,16 +265,16 @@ public class PersonControllerXMLTest extends AbstractIntegrationTest{
 		assertEquals("Male", firstPerson.getGender());
 		assertEquals(true, firstPerson.getEnabled());
 		
-		PersonDTO sixthPerson = people.get(6);
+		PersonDTO thirdPerson = people.get(3);
 		
-		assertNotNull(sixthPerson.getId());
-		assertTrue(sixthPerson.getId()>0);
+		assertNotNull(thirdPerson.getId());
+		assertTrue(thirdPerson.getId()>0);
 		
-		assertEquals("Alexandra", sixthPerson.getFirstName());
-		assertEquals("Arguile", sixthPerson.getLastName());
-		assertEquals("11th Floor", sixthPerson.getAddress());
-		assertEquals("Female", sixthPerson.getGender());
-		assertTrue(sixthPerson.getEnabled());
+		assertEquals("Alexandra", thirdPerson.getFirstName());
+		assertEquals("Arguile", thirdPerson.getLastName());
+		assertEquals("11th Floor", thirdPerson.getAddress());
+		assertEquals("Female", thirdPerson.getGender());
+		assertTrue(thirdPerson.getEnabled());
 	}
 	
 	private void mockPerson() {
