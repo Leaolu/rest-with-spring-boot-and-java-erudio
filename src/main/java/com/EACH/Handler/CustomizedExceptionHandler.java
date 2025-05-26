@@ -3,6 +3,7 @@ package com.EACH.Handler;
 import java.util.Date;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,6 +17,7 @@ import com.EACH.exceptions.FileNotFoundException;
 import com.EACH.exceptions.FileStorageException;
 import com.EACH.exceptions.RequiredObjectIsNull;
 import com.EACH.exceptions.ResourceNotFoundException;
+import com.EACH.exceptions.UnAuthoException;
 import com.EACH.exceptions.UnsupportedMediaTypeException;
 
 @ControllerAdvice
@@ -63,7 +65,10 @@ public class CustomizedExceptionHandler extends ResponseEntityExceptionHandler{
 		ExceptionResponse exceptionResponse = 
 				new ExceptionResponse
 				(new Date(), ex.getMessage(), request.getDescription(false));
-		return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+		return  ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.contentType(MediaType.TEXT_PLAIN)
+				.body(exceptionResponse);
 	}
 	@ExceptionHandler(FileStorageException.class)
 	public final ResponseEntity<ExceptionResponse> 
@@ -80,5 +85,13 @@ public class CustomizedExceptionHandler extends ResponseEntityExceptionHandler{
 				new ExceptionResponse
 				(new Date(), ex.getMessage(), request.getDescription(false));
 		return new ResponseEntity<>(exceptionResponse, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+	}
+	@ExceptionHandler(UnAuthoException.class)
+	public final ResponseEntity<ExceptionResponse> 
+	handleSecurityException(Exception ex, WebRequest request){
+		ExceptionResponse exceptionResponse = 
+				new ExceptionResponse
+				(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(exceptionResponse, HttpStatus.UNAUTHORIZED);
 	}
 }

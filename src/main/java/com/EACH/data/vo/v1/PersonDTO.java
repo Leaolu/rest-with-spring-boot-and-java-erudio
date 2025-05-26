@@ -86,6 +86,11 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
 	public void setEnabled(Boolean enabled) {
 		this.enabled = enabled;
 	}
+	
+	public String getName() {
+		return (firstName != null? firstName: "") +
+				(lastName != null? " " + lastName: "");
+	}
 
 	@Override
 	public int hashCode() {

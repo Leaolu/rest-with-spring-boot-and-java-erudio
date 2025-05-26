@@ -11,6 +11,7 @@ import com.EACH.exceptions.UnsupportedMediaTypeException;
 import com.EACH.file.exporter.MediaTypes;
 import com.EACH.file.exporter.contract.FileExporter;
 import com.EACH.file.exporter.impl.CsvExporter;
+import com.EACH.file.exporter.impl.PdfExporter;
 import com.EACH.file.exporter.impl.XlsxExporter;
 
 @Component
@@ -29,6 +30,10 @@ public class FileExporterFactory {
 		else if(acceptHeader.equalsIgnoreCase(MediaTypes.APPLICATION_XLSX_VALUE)) {
 			//return new XlsxExporter();
 			return context.getBean(XlsxExporter.class);
-		}else throw new UnsupportedMediaTypeException("Invalid File Format!");
+		}
+		else if(acceptHeader.equalsIgnoreCase(MediaTypes.APPLICATION_PDF_VALUE)) {
+		//return new XlsxExporter();
+			return context.getBean(PdfExporter.class);
+	}else throw new UnsupportedMediaTypeException("Invalid File Format!");
 	}
 }
