@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
+import com.EACH.Security.Util.UserDTO;
 import com.EACH.configs.TestConfigs;
 import com.EACH.integrationtests.DTO.BookDTOSoap;
 import com.EACH.integrationtests.DTO.wrapper.xml.PagedModelBook;
@@ -40,6 +42,8 @@ public class BookControllerXMLTest extends AbstractIntegrationTest{
 	private static XmlMapper xmlMapper;
 	
 	private static BookDTOSoap book;
+	private static UserDTO user;
+	private static String key;
 	
 	@BeforeAll
 	static void setUp() {
@@ -47,16 +51,70 @@ public class BookControllerXMLTest extends AbstractIntegrationTest{
 		xmlMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		
 		book = new BookDTOSoap();
+		user = new UserDTO();
 	}
 	
-
+	@AfterAll
+	static void deleteUser() {
+		specification = new RequestSpecBuilder()
+				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+				.setBasePath("/api/auth/v1")
+				.setPort(TestConfigs.SERVER_PORT)
+				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+				.build();
+		
+		given(specification)
+		.contentType(MediaType.APPLICATION_JSON_VALUE)
+		.body(user)
+		.delete("/delete")
+		.then()
+		.statusCode(204);
+	}
+	
 	@Test
 	@Order(1)
+	void getAutho() throws JsonMappingException, JsonProcessingException{
+		user.setUserName("Name");
+		user.setPassword("OI");
+			
+			specification = new RequestSpecBuilder()
+					.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+					.setBasePath("/api/auth/v1")
+					.setPort(TestConfigs.SERVER_PORT)
+					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+					.build();
+			
+					given(specification)
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.body(user)
+					.post("/signUp")
+					.then()
+					.statusCode(200);
+					
+					key = given(specification)
+							.contentType(MediaType.APPLICATION_JSON_VALUE)
+							.body(user)
+							.post("/signIn")
+							.then()
+							.statusCode(200)
+							.extract()
+							.body()
+							.asString();
+					
+					
+	}
+	
+	
+	@Test
+	@Order(2)
 	void createTest(){
 		mockBook();
 		
 		specification = new RequestSpecBuilder()
 				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, key)
 				.setBasePath("/api/book/v1")
 				.setPort(TestConfigs.SERVER_PORT)
 					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -98,7 +156,7 @@ public class BookControllerXMLTest extends AbstractIntegrationTest{
 	}
 	
 	@Test
-	@Order(2)
+	@Order(3)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 		book.setTitle("Historia");
 		
@@ -130,7 +188,7 @@ public class BookControllerXMLTest extends AbstractIntegrationTest{
 	
 	
 	@Test
-	@Order(3)
+	@Order(4)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
 		var content = given(specification)
 			.contentType(MediaType.APPLICATION_XML_VALUE)
@@ -157,7 +215,7 @@ public class BookControllerXMLTest extends AbstractIntegrationTest{
 		assertNotNull(createdBook.getLaunchDate());
 	}
 	@Test
-	@Order(4)
+	@Order(5)
 	void deleteTest() {
 		given(specification)
 				.pathParam("id", book.getId())
@@ -168,7 +226,7 @@ public class BookControllerXMLTest extends AbstractIntegrationTest{
 	}
 	
 	@Test
-	@Order(5)
+	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
 		var content = given(specification)
 			.accept(MediaType.APPLICATION_XML_VALUE)

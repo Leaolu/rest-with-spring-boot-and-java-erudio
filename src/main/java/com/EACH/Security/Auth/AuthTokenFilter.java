@@ -21,11 +21,16 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter{
 
-		@Autowired
-		private JwtUtil jwtUtil;
+		private final JwtUtil jwtUtil;
+		private final UserServices services;
 		
-		@Autowired
-		private UserServices services;
+		
+	
+		public AuthTokenFilter(JwtUtil jwtUtil, UserServices services) {
+			this.jwtUtil = jwtUtil;
+			this.services = services;
+		}
+		
 		@Override
 		protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,FilterChain filterChain) throws ServletException, IOException {
 				String jwt = parseJwt(request);

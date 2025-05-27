@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,11 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.EACH.Security.Util.JwtUtil;
 import com.EACH.Security.Util.UserDTO;
 import com.EACH.Security.Util.UserServices;
+import com.EACH.Security.Util.UserUtil;
 import com.EACH.controllers.docs.AuthControllerDocs;
 import com.EACH.exceptions.BadRequestException;
 import com.EACH.exceptions.NameAlreadyExistsException;
+import com.EACH.exceptions.UnAuthoException;
 import com.EACH.util.MediaType;
-
 
 import jakarta.validation.Valid;
 
@@ -65,6 +67,16 @@ public class AuthController implements AuthControllerDocs{
 						user.getPassword()));
 		UserDetails userDetails = (UserDetails) auth.getPrincipal();
 		return ResponseEntity.ok("Bearer "+jwt.generateToken(userDetails.getUsername()));
+	}
+
+	@DeleteMapping(value = "/delete")
+	public ResponseEntity<?> DeleteUser(@RequestBody UserDTO user) {
+		UserUtil VO = service.getByName(user.getUserName());
+		if(!encoder.matches(user.getPassword(), VO.getPassword())) {
+			throw new UnAuthoException("Wrong Password!");
+		}
+		service.delete(user);
+		return ResponseEntity.noContent().build();
 	}
 
 

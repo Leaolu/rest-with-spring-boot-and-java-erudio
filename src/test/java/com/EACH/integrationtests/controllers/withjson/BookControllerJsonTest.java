@@ -8,7 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
+import com.EACH.Security.Util.UserDTO;
 import com.EACH.configs.TestConfigs;
 import com.EACH.data.vo.v1.BookDTO;
 import com.EACH.integrationtests.DTO.wrapper.json.WrapperBookDTO;
@@ -37,9 +40,13 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 	
 	
 	private static RequestSpecification specification;
+	
+	
 	private static ObjectMapper objectMapper;
 	
 	private static BookDTO Book;
+	private static UserDTO user;
+	private static String key;
 	
 	@BeforeAll
 	static void setUp() {
@@ -47,15 +54,69 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		
 		Book = new BookDTO();
+		user = new UserDTO();
+		
 	}
 	
-
+	@AfterAll
+	static void deleteUser() {
+		specification = new RequestSpecBuilder()
+				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+				.setBasePath("/api/auth/v1")
+				.setPort(TestConfigs.SERVER_PORT)
+				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+				.build();
+		
+		given(specification)
+		.contentType(MediaType.APPLICATION_JSON_VALUE)
+		.body(user)
+		.delete("/delete")
+		.then()
+		.statusCode(204);
+	}
+	
 	@Test
 	@Order(1)
+	void getAutho() throws JsonMappingException, JsonProcessingException{
+		user.setUserName("Name");
+		user.setPassword("OI");
+			
+			specification = new RequestSpecBuilder()
+					.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+					.setBasePath("/api/auth/v1")
+					.setPort(TestConfigs.SERVER_PORT)
+					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+					.build();
+			
+					given(specification)
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.body(user)
+					.post("/signUp")
+					.then()
+					.statusCode(200);
+					
+					key = given(specification)
+							.contentType(MediaType.APPLICATION_JSON_VALUE)
+							.body(user)
+							.post("/signIn")
+							.then()
+							.statusCode(200)
+							.extract()
+							.body()
+							.asString();
+					
+					
+	}
+
+	@Test
+	@Order(2)
 	void createTest() throws JsonMappingException, JsonProcessingException {
 		mockBook();
 		
 		specification = new RequestSpecBuilder()
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, key)
 				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
 				.setBasePath("/api/book/v1")
 				.setPort(TestConfigs.SERVER_PORT)
@@ -88,7 +149,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 	}
 	
 	@Test
-	@Order(2)
+	@Order(3)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 		Book.setTitle("Historia");
 		
@@ -119,7 +180,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 	
 	
 	@Test
-	@Order(3)
+	@Order(4)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
 		var content = given(specification)
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -145,7 +206,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 		assertNotNull(createdBook.getLaunchDate());
 	}
 	@Test
-	@Order(4)
+	@Order(5)
 	void deleteTest() throws JsonMappingException, JsonProcessingException {
 		given(specification)
 				.pathParam("id", Book.getKey())
@@ -156,7 +217,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 	}
 	
 	@Test
-	@Order(5)
+	@Order(6)
 	void findByAllTest() throws JsonMappingException, JsonProcessingException {
 		var content = given(specification)
 			.accept(MediaType.APPLICATION_JSON_VALUE)

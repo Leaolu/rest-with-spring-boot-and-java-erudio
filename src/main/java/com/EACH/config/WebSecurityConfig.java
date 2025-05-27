@@ -42,7 +42,13 @@ public class WebSecurityConfig {
     	.cors(y -> y.disable())
     	.exceptionHandling(z -> z.authenticationEntryPoint(unauthoHandler))
     	.sessionManagement(a -> a.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-    	.authorizeHttpRequests(b -> b.requestMatchers("/api/auth/v1/**").permitAll()
+    	.authorizeHttpRequests(b -> b.requestMatchers(
+    			"/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-resources/**",
+                "/swagger-ui.html",
+                "/webjars/**",
+                "/api/auth/v1/**").permitAll()
     			.anyRequest()
     			.authenticated());
     	http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);

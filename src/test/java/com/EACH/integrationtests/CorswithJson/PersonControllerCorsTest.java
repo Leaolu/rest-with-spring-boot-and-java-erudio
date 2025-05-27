@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
+import com.EACH.Security.Util.UserDTO;
 import com.EACH.configs.TestConfigs;
 import com.EACH.data.vo.v1.PersonDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,6 +38,9 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest{
 	private static ObjectMapper objectMapper;
 	
 	private static PersonDTO person;
+	private static UserDTO user;
+	private static String key;
+	
 	
 	@BeforeAll
 	static void setUp() {
@@ -43,16 +48,70 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest{
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		
 		person = new PersonDTO();
+		user = new UserDTO();
 	}
 	
-
+	
+	@AfterAll
+	static void deleteUser() {
+		specification = new RequestSpecBuilder()
+				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+				.setBasePath("/api/auth/v1")
+				.setPort(TestConfigs.SERVER_PORT)
+				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+				.build();
+		
+		given(specification)
+		.contentType(MediaType.APPLICATION_JSON_VALUE)
+		.body(user)
+		.delete("/delete")
+		.then()
+		.statusCode(204);
+	}
+	
 	@Test
 	@Order(1)
+	void getAutho() throws JsonMappingException, JsonProcessingException{
+		user.setUserName("Name");
+		user.setPassword("OI");
+			
+			specification = new RequestSpecBuilder()
+					.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+					.setBasePath("/api/auth/v1")
+					.setPort(TestConfigs.SERVER_PORT)
+					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+					.build();
+			
+					given(specification)
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.body(user)
+					.post("/signUp")
+					.then()
+					.statusCode(200);
+					
+					key = given(specification)
+							.contentType(MediaType.APPLICATION_JSON_VALUE)
+							.body(user)
+							.post("/signIn")
+							.then()
+							.statusCode(200)
+							.extract()
+							.body()
+							.asString();
+					
+					
+	}
+
+	@Test
+	@Order(2)
 	void create() throws JsonMappingException, JsonProcessingException {
 		mockPerson();
 		
 		specification = new RequestSpecBuilder()
 				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, key)
 				.setBasePath("/api/person/v1")
 				.setPort(TestConfigs.SERVER_PORT)
 				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -89,10 +148,11 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest{
 	}
 	
 	@Test
-	@Order(2)
+	@Order(3)
 	void createWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
 		specification = new RequestSpecBuilder()
 			.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_SEMERU)
+			.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, key)
 			.setBasePath("/api/person/v1")
 			.setPort(TestConfigs.SERVER_PORT)
 			.addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -114,10 +174,11 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest{
 	}
 	
 	@Test
-	@Order(3)
+	@Order(4)
 	void findById() throws JsonMappingException, JsonProcessingException {
 		specification = new RequestSpecBuilder()
 				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, key)
 				.setBasePath("/api/person/v1")
 				.setPort(TestConfigs.SERVER_PORT)
 					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -153,10 +214,11 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest{
 		assertTrue(createdPerson.getEnabled());
 	}
 	@Test
-	@Order(4)
+	@Order(5)
 	void findByIdWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
 		specification = new RequestSpecBuilder()
 				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_SEMERU)
+				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, key)
 				.setBasePath("/api/person/v1")
 				.setPort(TestConfigs.SERVER_PORT)
 				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
