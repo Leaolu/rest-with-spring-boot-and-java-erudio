@@ -10,9 +10,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.EACH.Security.Util.JwtRefreshUtil;
 import com.EACH.Security.Util.JwtUtil;
 import com.EACH.Security.Util.UserDTO;
 import com.EACH.Security.Util.UserServices;
@@ -34,6 +36,8 @@ public class AuthController implements AuthControllerDocs{
 	private UserServices service;
 	@Autowired
 	private JwtUtil jwt;
+	@Autowired 
+	JwtRefreshUtil refresh;
 	
 	@Autowired
 	private PasswordEncoder encoder;
@@ -66,9 +70,25 @@ public class AuthController implements AuthControllerDocs{
 						user.getUserName(), 
 						user.getPassword()));
 		UserDetails userDetails = (UserDetails) auth.getPrincipal();
-		return ResponseEntity.ok("Bearer "+jwt.generateToken(userDetails.getUsername()));
+		return ResponseEntity.ok("Bearer "+jwt.generateToken(userDetails.getUsername())+
+				","+"Bearer "+refresh.generateToken(userDetails.getUsername()));
 	}
-
+	
+	@PostMapping(value = "/refreshToken")
+	public ResponseEntity<String> refreshToken(@RequestHeader String refreshToken){
+		refreshToken = (refreshToken.startsWith("Bearer"))? refreshToken.substring(7) : refreshToken;
+		
+		if(!refresh.validateJWTsToken(refreshToken)) {
+			throw new UnAuthoException("Refresh Token Invalid!");
+		}
+		
+		String name = refresh.getNameFromToken(refreshToken);
+		
+		UserDetails user = service.loadUserByUsername(name);
+		
+		return ResponseEntity.ok("Bearer "+jwt.generateToken(user.getUsername()));
+	}
+	
 	@DeleteMapping(value = "/delete")
 	public ResponseEntity<?> DeleteUser(@RequestBody UserDTO user) {
 		UserUtil VO = service.getByName(user.getUserName());

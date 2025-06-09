@@ -105,7 +105,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 							.statusCode(200)
 							.extract()
 							.body()
-							.asString();
+							.asString().split(",")[0];
 					
 					
 	}

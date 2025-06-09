@@ -12,7 +12,6 @@ import IntegrationTest.testcontainers.AbstractIntegrationTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SwaggerIntegrationTest extends AbstractIntegrationTest{
-	
 	@Test
 	public void shouldDisplaySwaggerUiPage() {
 		

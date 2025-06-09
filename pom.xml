@@ -34,7 +34,6 @@
 		<rest-assured.version>4.5.0</rest-assured.version>
 		<apache.poi.version>5.4.0</apache.poi.version>
 		<commons-csv.version>1.14.0</commons-csv.version>
-		<jasperreports.version>7.0.1</jasperreports.version>
 	</properties>
 
 	<dependencies>
@@ -85,25 +84,6 @@
 			<version>${apache.poi.version}</version>
 		</dependency>
 		
-		
-		<dependency>
-			<groupId>net.sf.jasperreports</groupId>
-			<artifactId>jasperreports</artifactId>
-			<version>${jasperreports.version}</version>
-		</dependency>
-		
-		<!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports-fonts -->
-		<dependency>
-			<groupId>net.sf.jasperreports</groupId>
-			<artifactId>jasperreports-fonts</artifactId>
-			<version>${jasperreports.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sf.jasperreports</groupId>
-			<artifactId>jasperreports-pdf</artifactId>
-			<version>${jasperreports.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.flywaydb</groupId>
@@ -144,6 +124,18 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>mysql</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 
@@ -238,7 +230,7 @@
 				<configuration>
 					<url>jdbc:mysql://localhost:3306/api_with_spring</url>
 					<user>root</user>
-					<password>Kelowna</password>
+					<password>Kelowna@2025!</password>
 					<locations>
 						<location>classpath:db/migration</location>
 					</locations>

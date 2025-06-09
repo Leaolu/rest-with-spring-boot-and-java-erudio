@@ -3,7 +3,7 @@ server:
 cors:
   originPatterns: http://localhost:8080,http://localhost:3000,https://github.com/Leaolu/rest-with-spring-boot-and-java-erudio	
 file:
-   uploadDir: /Projects/rest-with-spring-boot-and-java-erudio/File_Codes
+   uploadDir: ./rest-with-spring-boot-and-java-erudio/file-uploads
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

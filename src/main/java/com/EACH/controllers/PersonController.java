@@ -68,8 +68,7 @@ public class PersonController implements PersonControllerDocs{
 	
 	@GetMapping(value = "/exportPage", produces = { 
 			MediaTypes.APPLICATION_XLSX_VALUE, 
-			MediaTypes.APPLICATION_CSV_VALUE,
-			MediaTypes.APPLICATION_PDF_VALUE})
+			MediaTypes.APPLICATION_CSV_VALUE})
 	public ResponseEntity<Resource> exportPage(
 			@RequestParam(defaultValue = "0")Integer page,
 			@RequestParam(defaultValue = "12")Integer size,
@@ -85,8 +84,7 @@ public class PersonController implements PersonControllerDocs{
 		
 		Map<String, String> extensionMap = Map.of(
 				MediaTypes.APPLICATION_XLSX_VALUE, ".xlsx",
-				MediaTypes.APPLICATION_CSV_VALUE, ".csv",
-				MediaTypes.APPLICATION_PDF_VALUE, ".pdf"
+				MediaTypes.APPLICATION_CSV_VALUE, ".csv"
 				);
 		
 		var fileExtension = extensionMap.getOrDefault(acceptHeader, "");

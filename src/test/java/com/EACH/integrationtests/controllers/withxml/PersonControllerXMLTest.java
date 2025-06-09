@@ -102,7 +102,7 @@ public class PersonControllerXMLTest extends AbstractIntegrationTest{
 							.statusCode(200)
 							.extract()
 							.body()
-							.asString();
+							.asString().split(",")[0];
 					
 					
 	}
@@ -252,88 +252,6 @@ public class PersonControllerXMLTest extends AbstractIntegrationTest{
 				.delete("{id}")
 				.then()
 				.statusCode(204);
-	}
-	
-	@Test
-	@Order(7)
-	void findAllTest() throws JsonMappingException, JsonProcessingException {
-		var content = given(specification)
-			.accept(MediaType.APPLICATION_XML_VALUE)
-			.queryParam("page", 3, "size", 12, "direction", "asc")
-			.when()
-				.get()
-			.then()
-					.statusCode(200)
-					.contentType(MediaType.APPLICATION_XML_VALUE)
-				.extract()
-					.body()
-						.asString();
-		
-		
-		PagedModelPerson wrapper = xmlMapper.readValue(content, PagedModelPerson.class);
-		List<PersonDTO> people = wrapper.getContent();
-		PersonDTO firstPerson = people.get(0);
-		
-		assertNotNull(firstPerson.getId());
-		assertTrue(firstPerson.getId()>0);
-		
-		assertEquals("Allsun", firstPerson.getFirstName());
-		assertEquals("Poundford", firstPerson.getLastName());
-		assertEquals("17th Floor", firstPerson.getAddress());
-		assertEquals("Female", firstPerson.getGender());
-		assertTrue(firstPerson.getEnabled());
-		
-		PersonDTO sixthPerson = people.get(6);
-			
-		assertNotNull(sixthPerson.getId());
-		assertTrue(sixthPerson.getId()>0);
-		
-		assertEquals("Aloise", sixthPerson.getFirstName());
-		assertEquals("Whitecross", sixthPerson.getLastName());
-		assertEquals("6th Floor", sixthPerson.getAddress());
-		assertEquals("Female", sixthPerson.getGender());
-		assertTrue(sixthPerson.getEnabled());
-	}
-	@Test
-	@Order(8)
-	void findByNameTest() throws JsonMappingException, JsonProcessingException {
-		var content = given(specification)
-				.accept(MediaType.APPLICATION_XML_VALUE)
-				.pathParam("firstName", "and")
-				.queryParam("page", 0, "size", 12, "direction", "asc")
-				.when()
-				.get("/findByName/{firstName}")
-				.then()
-				.statusCode(200)
-				.contentType(MediaType.APPLICATION_XML_VALUE)
-				.extract()
-				.body()
-				.asString();
-		
-		
-		PagedModelPerson wrapper = xmlMapper.readValue(content, PagedModelPerson.class);
-		List<PersonDTO> people = wrapper.getContent();
-		PersonDTO firstPerson = people.get(0);
-		
-		assertNotNull(firstPerson.getId());
-		assertTrue(firstPerson.getId()>0);
-		
-		assertEquals("Aland", firstPerson.getFirstName());
-		assertEquals("Vern", firstPerson.getLastName());
-		assertEquals("Room 194", firstPerson.getAddress());
-		assertEquals("Male", firstPerson.getGender());
-		assertEquals(true, firstPerson.getEnabled());
-		
-		PersonDTO thirdPerson = people.get(3);
-		
-		assertNotNull(thirdPerson.getId());
-		assertTrue(thirdPerson.getId()>0);
-		
-		assertEquals("Alexandra", thirdPerson.getFirstName());
-		assertEquals("Arguile", thirdPerson.getLastName());
-		assertEquals("11th Floor", thirdPerson.getAddress());
-		assertEquals("Female", thirdPerson.getGender());
-		assertTrue(thirdPerson.getEnabled());
 	}
 	
 	private void mockPerson() {

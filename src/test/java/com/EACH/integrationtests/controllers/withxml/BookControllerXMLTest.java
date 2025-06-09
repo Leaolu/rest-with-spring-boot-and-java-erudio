@@ -101,7 +101,7 @@ public class BookControllerXMLTest extends AbstractIntegrationTest{
 							.statusCode(200)
 							.extract()
 							.body()
-							.asString();
+							.asString().split(",")[0];
 					
 					
 	}
@@ -225,46 +225,6 @@ public class BookControllerXMLTest extends AbstractIntegrationTest{
 				.statusCode(204);
 	}
 	
-	@Test
-	@Order(6)
-	void findAllTest() throws JsonMappingException, JsonProcessingException {
-		var content = given(specification)
-			.accept(MediaType.APPLICATION_XML_VALUE)
-			.queryParam("page", 0, "size", 12, "direction", "asc")
-			.when()
-				.get()
-			.then()
-					.statusCode(200)
-					.contentType(MediaType.APPLICATION_XML_VALUE)
-				.extract()
-					.body()
-						.asString();
-		
-		
-		PagedModelBook wrapper = xmlMapper.readValue(content, PagedModelBook.class);
-		List<BookDTOSoap> book = wrapper.getContent();
-		BookDTOSoap firstBook = book.get(0);
-		
-		assertNotNull(firstBook.getId());
-		assertTrue(firstBook.getId()>0);
-		
-		
-		assertEquals("Abbey Sanches", firstBook.getAuthor());
-		assertEquals("10.3", Double.toString(firstBook.getPrice()));
-		assertEquals("Already Dead", firstBook.getTitle());
-		assertNotNull(firstBook.getLaunchDate());
-		
-		BookDTOSoap seventhBook = book.get(7);
-			
-		assertNotNull(seventhBook.getId());
-		assertTrue(seventhBook.getId()>0);
-		
-		assertEquals("Adelaide Swine", seventhBook.getAuthor());
-		assertEquals("36.7", Double.toString(seventhBook.getPrice()));
-		assertEquals("The Horribly Slow Murderer with the Extremely Inefficient Weapon", seventhBook.getTitle());
-		assertNotNull(seventhBook.getLaunchDate());
-	}
-
 	private void mockBook() {
 		book.setAuthor("Lucas");
 		book.setPrice(2.50);

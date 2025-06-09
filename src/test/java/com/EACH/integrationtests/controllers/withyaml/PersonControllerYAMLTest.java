@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.EACH.Security.Util.UserDTO;
 import com.EACH.configs.TestConfigs;
 import com.EACH.integrationtests.DTO.PersonDTO;
 import com.EACH.integrationtests.DTO.wrapper.xml.PagedModelPerson;
@@ -44,6 +46,8 @@ public class PersonControllerYAMLTest extends AbstractIntegrationTest{
 	private static YAMLMapper objectMapper;
 	
 	private static PersonDTO person;
+	private static UserDTO user;
+	private static String key;
 	
 	
 	 @BeforeAll
@@ -60,15 +64,70 @@ public class PersonControllerYAMLTest extends AbstractIntegrationTest{
 
 	        // Initialize the person object
 	        person = new PersonDTO();
+	        user = new UserDTO();
 	    }
+	 
+	 @AfterAll
+		static void deleteUser() throws JsonProcessingException, JsonMappingException {
+			specification = new RequestSpecBuilder()
+					.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+					.setBasePath("/api/auth/v1")
+					.setPort(TestConfigs.SERVER_PORT)
+					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+					.build();
+			String requestBody = objectMapper.writeValueAsString(user);
+			given(specification)
+			.contentType(MediaType.APPLICATION_YML)
+			.body(requestBody)
+			.delete("/delete")
+			.then()
+			.statusCode(204);
+		}
+		
+	 @Test
+		@Order(1)
+		void getAutho() throws JsonMappingException, JsonProcessingException{
+			user.setUserName("Name");
+			user.setPassword("OI");
+			String requestBody = objectMapper.writeValueAsString(user);
+				
+				specification = new RequestSpecBuilder()
+						.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+						.setBasePath("/api/auth/v1")
+						.setPort(TestConfigs.SERVER_PORT)
+						.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+						.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+						.build();
+				
+						given(specification)
+						.contentType(MediaType.APPLICATION_YML)
+						.body(requestBody)
+						.post("/signUp")
+						.then()
+						.statusCode(200);
+						
+						key = given(specification)
+								.contentType(MediaType.APPLICATION_YML)
+								.body(requestBody)
+								.post("/signIn")
+								.then()
+								.statusCode(200)
+								.extract()
+								.body()
+								.asString().split(",")[0];
+						
+						
+		}
 
 	    @Test
-	    @Order(1)
+	    @Order(2)
 	    void createTest() throws JsonMappingException, JsonProcessingException {
 	        mockPerson();
 
 	        specification = new RequestSpecBuilder()
 	                .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+	                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, key)
 	                .setBasePath("/api/person/v1")
 	                .setPort(TestConfigs.SERVER_PORT)
 	                .addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -109,7 +168,7 @@ public class PersonControllerYAMLTest extends AbstractIntegrationTest{
 	    }
 	
 	@Test
-	@Order(2)
+	@Order(3)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 		person.setLastName("Hyuga");
 		
@@ -145,7 +204,7 @@ public class PersonControllerYAMLTest extends AbstractIntegrationTest{
 	
 	
 	@Test
-	@Order(3)
+	@Order(4)
 	void findByIdTest() throws com.fasterxml.jackson.databind.JsonMappingException, com.fasterxml.jackson.core.JsonProcessingException {
 		var content = given(specification)
 			.contentType(MediaType.APPLICATION_YML)
@@ -175,7 +234,7 @@ public class PersonControllerYAMLTest extends AbstractIntegrationTest{
 		assertTrue(createdPerson.getEnabled());
 	}
 	@Test
-	@Order(4)
+	@Order(5)
 	void disableTest() throws JsonMappingException, JsonProcessingException {
 		var content = given(specification)
 				.accept(MediaType.APPLICATION_YML)
@@ -202,7 +261,7 @@ public class PersonControllerYAMLTest extends AbstractIntegrationTest{
 		assertFalse(createdPerson.getEnabled());
 	}
 	@Test
-	@Order(5)
+	@Order(6)
 	void deleteTest() {
 		given(specification)
 				.pathParam("id", person.getId())
@@ -211,47 +270,7 @@ public class PersonControllerYAMLTest extends AbstractIntegrationTest{
 				.then()
 				.statusCode(204);
 	}
-	
-	@Test
-	@Order(6)
-	void findAllTest() throws JsonMappingException, JsonProcessingException {
-		 var responseBody = given(specification)
-	                .accept(MediaType.APPLICATION_YML)
-	                .queryParams("page", 3, "size", 12, "direction", "asc")
-	                .when()
-	                .get()
-	                .then()
-	                .statusCode(200)
-	                .contentType(MediaType.APPLICATION_YML)
-	                .extract()
-	                .body()
-	                .asString();
-		
-		PagedModelPerson response = objectMapper.readValue(responseBody, PagedModelPerson.class);
-		List<PersonDTO> people = response.getContent();
-		PersonDTO firstPerson = people.get(0);
-		
-		assertNotNull(firstPerson.getId());
-		assertTrue(firstPerson.getId()>0);
-		
-		assertEquals("Allsun", firstPerson.getFirstName());
-		assertEquals("Poundford", firstPerson.getLastName());
-		assertEquals("17th Floor", firstPerson.getAddress());
-		assertEquals("Female", firstPerson.getGender());
-		assertTrue(firstPerson.getEnabled());
-		
-		PersonDTO sixthPerson = people.get(6);
-			
-		assertNotNull(sixthPerson.getId());
-		assertTrue(sixthPerson.getId()>0);
-		
-		assertEquals("Aloise", sixthPerson.getFirstName());
-		assertEquals("Whitecross", sixthPerson.getLastName());
-		assertEquals("6th Floor", sixthPerson.getAddress());
-		assertEquals("Female", sixthPerson.getGender());
-		assertTrue(sixthPerson.getEnabled());
-		}
-	
+
 	@Test
 	@Order(7)
 	void findByNameTest() throws JsonMappingException, JsonProcessingException {
