@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Date;
-import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -20,7 +19,6 @@ import org.springframework.http.MediaType;
 import com.EACH.Security.Util.UserDTO;
 import com.EACH.configs.TestConfigs;
 import com.EACH.integrationtests.DTO.BookDTOSoap;
-import com.EACH.integrationtests.DTO.wrapper.xml.PagedModelBook;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;

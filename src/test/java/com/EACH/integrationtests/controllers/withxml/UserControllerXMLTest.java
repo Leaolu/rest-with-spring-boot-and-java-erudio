@@ -1,4 +1,4 @@
-package com.EACH.integrationtests.controllers.withjson;
+package com.EACH.integrationtests.controllers.withxml;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertNotNull;
@@ -16,7 +16,7 @@ import com.EACH.configs.TestConfigs;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import IntegrationTest.testcontainers.AbstractIntegrationTest;
 import io.restassured.builder.RequestSpecBuilder;
@@ -27,21 +27,20 @@ import io.restassured.specification.RequestSpecification;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(OrderAnnotation.class)
-public class UserControllerJsonTest extends AbstractIntegrationTest{
+public class UserControllerXMLTest extends AbstractIntegrationTest{
 	
 	
 	private static RequestSpecification specification;
-	private static ObjectMapper objectMapper;
+	private static XmlMapper objectMapper;
 	private static UserDTO user;
 	
 	private static String content;
 	private static String key;
 	private static String refresh;
 	
-	
 	@BeforeAll
 	static void setUp() {
-		objectMapper = new ObjectMapper();
+		objectMapper = new XmlMapper();
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		
 		user = new UserDTO();
@@ -50,6 +49,7 @@ public class UserControllerJsonTest extends AbstractIntegrationTest{
 	@Test
 	@Order(1)
 	void UnauthenticatedRequest() throws JsonMappingException, JsonProcessingException {
+		
 		specification = new RequestSpecBuilder()
 				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
 				.setBasePath("/api/person/v1")
@@ -59,7 +59,7 @@ public class UserControllerJsonTest extends AbstractIntegrationTest{
 				.build();
 		
 		given(specification)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.contentType(MediaType.APPLICATION_XML_VALUE)
 					.pathParam("id", 9)
 				.when()
 					.get("/{id}")
@@ -71,21 +71,15 @@ public class UserControllerJsonTest extends AbstractIntegrationTest{
 	@Order(2)
 	void SignUp() throws JsonMappingException, JsonProcessingException {
 		mockUser();
-		specification = new RequestSpecBuilder()
-				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
-				.setBasePath("/api/auth/v1")
-				.setPort(TestConfigs.SERVER_PORT)
-				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
-				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-				.build();
-		
+		uSpec();
 		content = given(specification)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.contentType(MediaType.APPLICATION_XML_VALUE)
+				.accept(MediaType.APPLICATION_XML_VALUE)
 				.body(user)
 				.post("/signUp")
 				.then()
 				.statusCode(200)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.contentType(MediaType.APPLICATION_XML_VALUE)
 				.extract()
 				.body()
 				.asString();
@@ -98,21 +92,21 @@ public class UserControllerJsonTest extends AbstractIntegrationTest{
 	void SignIn() throws JsonMappingException, JsonProcessingException{
 		
 		refresh = given(specification)
-		.contentType(MediaType.APPLICATION_JSON_VALUE)
+		.contentType(MediaType.APPLICATION_XML_VALUE)
+		.accept(MediaType.APPLICATION_XML_VALUE)
 		.body(user)
 		.post("/signIn")
 		.then()
 		.statusCode(200)
-		.contentType(MediaType.APPLICATION_JSON_VALUE)
+		.contentType(MediaType.APPLICATION_XML_VALUE)
 		.extract()
 		.body()
 		.asString().split(",")[1];
-		
 	}
 	
 	@Test
 	@Order(4)
-	void RefreshToken() throws JsonProcessingException, JsonMappingException{
+	void refreshToken() {
 		specification = new RequestSpecBuilder()
 				.addHeader("refreshToken", refresh)
 				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
@@ -123,18 +117,22 @@ public class UserControllerJsonTest extends AbstractIntegrationTest{
 				.build();
 		
 		key = given(specification)
+				.contentType(MediaType.APPLICATION_XML_VALUE)
+				.accept(MediaType.APPLICATION_XML_VALUE)
 				.post("/refreshToken")
 				.then()
 				.statusCode(200)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.contentType(MediaType.APPLICATION_XML_VALUE)
 				.extract()
 				.body()
 				.asString();
+				
 	}
 	
 	@Test
 	@Order(5)
-	void AuthorizatedRequest() throws JsonMappingException, JsonProcessingException{
+	void authenticatedRequest() throws JsonMappingException, JsonProcessingException{
+		
 		specification = new RequestSpecBuilder()
 				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, key)
 				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
@@ -145,16 +143,17 @@ public class UserControllerJsonTest extends AbstractIntegrationTest{
 				.build();
 		
 		given(specification)
-		.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.contentType(MediaType.APPLICATION_XML_VALUE)
+			.accept(MediaType.APPLICATION_XML_VALUE)
 			.get()
-		.then()
-				.statusCode(200);
-		
+			.then()
+			.statusCode(200);
 	}
 	
 	@Test
 	@Order(6)
 	void Delete() throws JsonMappingException, JsonProcessingException{
+		
 		specification = new RequestSpecBuilder()
 				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
 				.setBasePath("/api/auth/v1")
@@ -163,8 +162,9 @@ public class UserControllerJsonTest extends AbstractIntegrationTest{
 				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
 				.build();
 		
+		
 		given(specification)
-		.contentType(MediaType.APPLICATION_JSON_VALUE)
+		.contentType(MediaType.APPLICATION_XML_VALUE)
 		.body(user)
 		.delete("/delete")
 		.then()
@@ -177,6 +177,18 @@ public class UserControllerJsonTest extends AbstractIntegrationTest{
 	private void mockUser() {
 		user.setUserName("Luisa");
 		user.setPassword("Password");
+	}
+	
+	
+	private void uSpec() {
+		specification = new RequestSpecBuilder()
+				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+				.setBasePath("/api/auth/v1")
+				.setPort(TestConfigs.SERVER_PORT)
+				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
+				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+				.build();
+		
 	}
 	
 }

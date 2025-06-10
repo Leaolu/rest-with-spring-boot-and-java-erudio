@@ -74,7 +74,7 @@ public class AuthController implements AuthControllerDocs{
 				","+"Bearer "+refresh.generateToken(userDetails.getUsername()));
 	}
 	
-	@PostMapping(value = "/refreshToken")
+	@PostMapping(value = "/refreshToken", produces = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
 	public ResponseEntity<String> refreshToken(@RequestHeader String refreshToken){
 		refreshToken = (refreshToken.startsWith("Bearer"))? refreshToken.substring(7) : refreshToken;
 		
